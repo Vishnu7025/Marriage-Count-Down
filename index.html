@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Marriage Countdown</title>
@@ -47,8 +48,9 @@
             text-align: center;
             padding: 40px 50px;
             background: rgba(0, 0, 0, 0.6);
-            border-radius: 16px;
-            backdrop-filter: blur(6px);
+            border-radius: 18px;
+            backdrop-filter: blur(8px);
+            max-width: 420px;
         }
 
         h1 {
@@ -93,13 +95,77 @@
                 transform: scale(1);
                 opacity: 0.9;
             }
+
             50% {
                 transform: scale(1.08);
                 opacity: 1;
             }
+
             100% {
                 transform: scale(1);
                 opacity: 0.9;
+            }
+        }
+
+        /* Invitation preview */
+        .invite-wrapper {
+            margin-top: 30px;
+            text-align: center;
+            animation: fadeUp 1.8s ease forwards;
+        }
+
+        .invite-card {
+            max-width: 260px;
+            width: 100%;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow:
+                0 10px 30px rgba(255, 182, 193, 0.35),
+                0 0 20px rgba(255, 255, 255, 0.2);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .invite-card:hover {
+            transform: scale(1.05);
+            box-shadow:
+                0 15px 40px rgba(255, 182, 193, 0.55),
+                0 0 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .invite-text {
+            margin-top: 10px;
+            font-size: 13px;
+            opacity: 0.85;
+            letter-spacing: 0.5px;
+        }
+
+        /* Fullscreen invitation */
+        .invite-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .invite-full {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 18px;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.25);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
@@ -124,9 +190,11 @@
                 transform: translateY(100vh) scale(0.8);
                 opacity: 0;
             }
+
             10% {
                 opacity: 1;
             }
+
             100% {
                 transform: translateY(-10vh) scale(1.2);
                 opacity: 0;
@@ -137,119 +205,152 @@
             .number {
                 font-size: 32px;
             }
+
             h1 {
                 font-size: 30px;
             }
         }
+        .just-married {
+            font-size: 42px;
+            font-weight: bold;
+            text-align: center;
+            animation: pulse 1.6s ease-in-out infinite;
+            text-shadow:
+                0 0 12px rgba(255, 182, 193, 0.9),
+                0 0 25px rgba(255, 255, 255, 0.6);
+        }
+
     </style>
 </head>
+
 <body>
 
-<!-- Background -->
-<div id="bg" class="bg"></div>
-<div class="overlay"></div>
+    <!-- Background -->
+    <div id="bg" class="bg"></div>
+    <div class="overlay"></div>
 
-<!-- Floating Hearts -->
-<div class="hearts"></div>
+    <!-- Floating Hearts -->
+    <div class="hearts"></div>
 
-<!-- Content -->
-<div class="content">
-    <div class="countdown-box">
-        <h1>💍 Our Big Day</h1>
-        <div class="subtitle">Two hearts ❤️ One forever ♾️</div>
+    <!-- Content -->
+    <div class="content">
+        <div class="countdown-box" id="countdownBox">
+            <h1>💍 Our Big Day</h1>
+            <div class="subtitle">Vishnu ❤️ Pragina · Two hearts, one forever ♾️</div>
 
-        <div class="time">
-            <div class="unit">
-                <div class="number" id="days">--</div>
-                <div class="label">Days</div>
+            <div class="time" id="timeGrid">
+                <div class="unit">
+                    <div class="number" id="days">--</div>
+                    <div class="label">Days</div>
+                </div>
+                <div class="unit">
+                    <div class="number" id="hours">--</div>
+                    <div class="label">Hours</div>
+                </div>
+                <div class="unit">
+                    <div class="number" id="minutes">--</div>
+                    <div class="label">Minutes</div>
+                </div>
+                <div class="unit">
+                    <div class="number" id="seconds">--</div>
+                    <div class="label">Seconds</div>
+                </div>
             </div>
-            <div class="unit">
-                <div class="number" id="hours">--</div>
-                <div class="label">Hours</div>
-            </div>
-            <div class="unit">
-                <div class="number" id="minutes">--</div>
-                <div class="label">Minutes</div>
-            </div>
-            <div class="unit">
-                <div class="number" id="seconds">--</div>
-                <div class="label">Seconds</div>
+
+            <!-- Invitation Card -->
+            <div class="invite-wrapper">
+                <img src="invitation_card.jpg" class="invite-card" onclick="openInvite()" />
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    /* Background slideshow */
-    const images = [
-        "WhatsApp Image 2026-01-29 at 6.08.03 PM.jpeg",
-        "WhatsApp Image 2026-01-29 at 6.07.16 PM.jpeg"
-    ];
+    <!-- Fullscreen Invitation -->
+    <div class="invite-modal" id="inviteModal" onclick="closeInvite()">
+        <img src="invitation_card.jpg" class="invite-full" />
+    </div>
 
-    let index = 0;
-    const bg = document.getElementById("bg");
+    <script>
+        /* Background slideshow */
+        const images = [
+            "WhatsApp Image 2026-01-29 at 6.08.03 PM.jpeg",
+            "WhatsApp Image 2026-01-29 at 6.07.16 PM.jpeg",
+            "countdownimage3.jpeg",
+            "countdwonfacetoface.jpeg"
+        ];
 
-    bg.style.backgroundImage = `url("${images[0]}")`;
-    bg.style.opacity = 1;
+        let index = 0;
+        const bg = document.getElementById("bg");
 
-    function changeBackground() {
-        bg.style.opacity = 0;
-        setTimeout(() => {
-            index = (index + 1) % images.length;
-            bg.style.backgroundImage = `url("${images[index]}")`;
-            bg.style.opacity = 1;
-        }, 1200);
-    }
+        bg.style.backgroundImage = `url("${images[0]}")`;
+        bg.style.opacity = 1;
 
-    setInterval(changeBackground, 6000);
+        setInterval(() => {
+            bg.style.opacity = 0;
+            setTimeout(() => {
+                index = (index + 1) % images.length;
+                bg.style.backgroundImage = `url("${images[index]}")`;
+                bg.style.opacity = 1;
+            }, 1200);
+        }, 6000);
 
-    /* Countdown */
-    const marriageDate = new Date("2026-05-10T00:00:00");
+        /* Countdown */
+        const marriageDate = new Date("2026-05-10T06:00:00");
 
-    function updateCountdown() {
-        const now = new Date();
-        const diff = marriageDate - now;
+        function updateCountdown() {
+            const diff = marriageDate - new Date();
+            if (diff <= 0) {
+                document.getElementById("timeGrid").style.display = "none";
 
-        if (diff <= 0) {
-            document.body.innerHTML =
-                "<h1 style='color:white;text-align:center;margin-top:40vh;'>💖 Just Married 💖</h1>";
-            return;
+                const box = document.getElementById("countdownBox");
+
+                if (!document.getElementById("justMarriedText")) {
+                    const msg = document.createElement("div");
+                    msg.id = "justMarriedText";
+                    msg.className = "just-married";
+                    msg.innerHTML = "💖 Just Married 💖";
+                    box.appendChild(msg);
+                }
+                return;
+            }
+
+            document.getElementById("days").textContent =
+                Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById("hours").textContent =
+                Math.floor((diff / (1000 * 60 * 60)) % 24);
+            document.getElementById("minutes").textContent =
+                Math.floor((diff / (1000 * 60)) % 60);
+            document.getElementById("seconds").textContent =
+                Math.floor((diff / 1000) % 60);
         }
 
-        document.getElementById("days").textContent =
-            Math.floor(diff / (1000 * 60 * 60 * 24));
-        document.getElementById("hours").textContent =
-            Math.floor((diff / (1000 * 60 * 60)) % 24);
-        document.getElementById("minutes").textContent =
-            Math.floor((diff / (1000 * 60)) % 60);
-        document.getElementById("seconds").textContent =
-            Math.floor((diff / 1000) % 60);
-    }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
 
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
+        /* Invitation modal */
+        function openInvite() {
+            document.getElementById("inviteModal").style.display = "flex";
+        }
 
-    /* Floating hearts generator */
-    const heartContainer = document.querySelector(".hearts");
-    const heartEmojis = ["💖", "💕", "💗", "💞", "✨"];
+        function closeInvite() {
+            document.getElementById("inviteModal").style.display = "none";
+        }
 
-    function createHeart() {
-        const heart = document.createElement("div");
-        heart.classList.add("heart");
-        heart.textContent =
-            heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+        /* Floating hearts */
+        const heartContainer = document.querySelector(".hearts");
+        const heartEmojis = ["💖", "💕", "💗", "💞", "✨"];
 
-        heart.style.left = Math.random() * 100 + "vw";
-        heart.style.animationDuration = 6 + Math.random() * 4 + "s";
-        heart.style.fontSize = 16 + Math.random() * 20 + "px";
-
-        heartContainer.appendChild(heart);
-
-        setTimeout(() => heart.remove(), 9000);
-    }
-
-    setInterval(createHeart, 500);
-</script>
+        setInterval(() => {
+            const heart = document.createElement("div");
+            heart.className = "heart";
+            heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = 6 + Math.random() * 4 + "s";
+            heart.style.fontSize = 16 + Math.random() * 20 + "px";
+            heartContainer.appendChild(heart);
+            setTimeout(() => heart.remove(), 9000);
+        }, 500);
+    </script>
 
 </body>
+
 </html>
