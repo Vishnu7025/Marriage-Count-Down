@@ -219,6 +219,28 @@
                 0 0 12px rgba(255, 182, 193, 0.9),
                 0 0 25px rgba(255, 255, 255, 0.6);
         }
+        .music-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 6;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 182, 193, 0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+        }
 
     </style>
 </head>
@@ -268,7 +290,14 @@
     <div class="invite-modal" id="inviteModal" onclick="closeInvite()">
         <img src="invitation_card.jpg" class="invite-full" />
     </div>
-
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="ringtone_romantic.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- Music Toggle Button -->
+    <div class="music-btn" onclick="toggleMusic()">
+        🎵
     <script>
         /* Background slideshow */
         const images = [
@@ -349,7 +378,32 @@
             heartContainer.appendChild(heart);
             setTimeout(() => heart.remove(), 9000);
         }, 500);
+        const bgMusic = document.getElementById("bgMusic");
+            let musicPlaying = false;
+
+            // Start music on first user interaction
+            document.addEventListener("click", () => {
+                if (!musicPlaying) {
+                    bgMusic.volume = 0.4; // soft & romantic
+                    bgMusic.play();
+                    musicPlaying = true;
+                }
+            }, { once: true });
+
+            // Toggle button
+            function toggleMusic() {
+                if (bgMusic.paused) {
+                    bgMusic.play();
+                    musicPlaying = true;
+                } else {
+                    bgMusic.pause();
+                    musicPlaying = false;
+                }
+            }
+
     </script>
+
+</div>
 
 </body>
 
